@@ -7,8 +7,6 @@ import com.example.lab9.model.DepositTransaction;
 import com.example.lab9.repository.AccountRepository;
 import com.example.lab9.repository.DepositRepository;
 
-import jakarta.transaction.Transactional;
-
 @Service
 public class DepositService{
     private final AccountRepository accountRepository;
@@ -19,7 +17,7 @@ public class DepositService{
         this.depositRepository = depositRepository;
     }
 
-    @Transactional
+    //@Transactional
     public void deposit(Long accountId, Double amount) {
         
         //ค้นหา Account จาก accountId
@@ -35,5 +33,7 @@ public class DepositService{
         transaction.setAmount(amount);
         transaction.setAccount(account);
         depositRepository.save(transaction);
+
+        throw new RuntimeException("Test Rollback");
     }
 }
