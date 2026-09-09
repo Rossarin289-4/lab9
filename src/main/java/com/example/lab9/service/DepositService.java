@@ -1,0 +1,39 @@
+package com.example.lab9.service;
+
+import org.springframework.stereotype.Service;
+
+import com.example.lab9.model.Account;
+import com.example.lab9.model.DepositTransaction;
+import com.example.lab9.repository.AccountRepository;
+import com.example.lab9.repository.DepositRepository;
+
+import jakarta.transaction.Transactional;
+
+@Service
+public class DepositService{
+    private final AccountRepository accountRepository;
+    private final DepositRepository depositRepository;
+
+    public DepositService(AccountRepository accountRepository, DepositRepository depositRepository) {
+        this.accountRepository = accountRepository;
+        this.depositRepository = depositRepository;
+    }
+
+    @Transactional
+    public void deposit(Long accountId, Double amount) {
+        
+        //ค้นหา Account จาก accountId
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new IllegalArgumentException("Account not found"));
+
+        //เพิ่มจำนวนเงินเข้า balance แล้วบันทึก Account
+        account.setBalance(account.getBalance() + amount);
+        accountRepository.save(account);
+
+        //สร้าง DepositTransaction ผูกกับ Account นั้น แล้วบันทึกลง Database
+        DepositTransaction transaction = new DepositTransaction();
+        transaction.setAmount(amount);
+        transaction.setAccount(account);
+        depositRepository.save(transaction);
+    }
+}
